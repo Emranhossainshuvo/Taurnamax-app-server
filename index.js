@@ -40,24 +40,47 @@ async function run() {
 
         app.delete("/topics/:id", async (req, res) => {
             const id = req.params.id;
-        
-            // Validate the id before using it
+
             if (!ObjectId.isValid(id)) {
                 return res.status(400).send({ error: "Invalid ID format" });
             }
-        
+
             try {
                 const query = { _id: new ObjectId(id) };
                 const result = await topicsCollection.deleteOne(query);
-        
+
                 if (result.deletedCount === 0) {
                     return res.status(404).send({ error: "Topic not found" });
                 }
-        
+
                 res.send({ message: "Topic deleted successfully" });
             } catch (error) {
                 console.error(error);
                 res.status(500).send({ error: "An error occurred while deleting the topic" });
+            }
+        });
+
+        app.put("/topics/:id", async (req, res) => {
+            const id = req.params.id;
+            const updatedTopic = req.body;
+
+            if (!ObjectId.isValid(id)) {
+                return res.status(400).send({ error: "Invalid ID format" });
+            }
+
+            try {
+                const query = { _id: new ObjectId(id) };
+                const update = { $set: updatedTopic };
+                const result = await topicsCollection.updateOne(query, update);
+
+                if (result.matchedCount === 0) {
+                    return res.status(404).send({ error: "Topic not found" });
+                }
+
+                res.send({ message: "Topic updated successfully" });
+            } catch (error) {
+                console.error(error);
+                res.status(500).send({ error: "An error occurred while updating the topic" });
             }
         });
 
