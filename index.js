@@ -27,12 +27,16 @@ async function run() {
         await client.connect();
         const topicsCollection = client.db('taurnamaxDB').collection('topics');
         
-        // POST route inside run function where topicsCollection is accessible
         app.post("/topics", async (req, res) => {
             const item = req.body;
             const result = await topicsCollection.insertOne(item);
             res.send(result);
         });
+
+        app.get("/topics", async(req, res) => {
+            const result = await topicsCollection.find().toArray();
+            res.send(result);
+        })
 
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
